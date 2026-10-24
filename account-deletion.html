@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>جدوى AI - حذف الحساب</title>
+<style>body{font:18px/1.8 system-ui;background:#fbfaf8;color:#00312e;max-width:660px;margin:50px auto;padding:20px}input,button{font:inherit;box-sizing:border-box;width:100%;padding:12px;margin:8px 0;border:1px solid #bbb;border-radius:8px}button{background:#00312e;color:white}label{display:block}input[type=checkbox]{width:auto}#message{color:#845b22}</style>
+<h1>حذف حساب جدوى AI</h1>
+<p>يمكنك حذف الحساب من إعدادات التطبيق أو من هذه الصفحة. سيُحذف حسابك وملفات الاشتراطات والدراسات اليدوية والذكية. تُستكمل إعادة محاولة التنظيف الآلية عند انقطاع الخدمة. تبقى معرفات مشتريات منفصلة لمنع تكرار استخدامها وسجل تقني لإكمال الحذف، دون ربطها بحساب نشط.</p>
+<p>الحذف لا يطلب استرداد قيمة الشراء تلقائياً؛ طلبات الاسترداد تتم لدى Google Play أو Apple. الملفات التي سبق أن حفظتها أو شاركتها خارج الخدمة لا يمكن حذفها من أجهزة الآخرين.</p>
+<form id="form">
+<label>البريد الإلكتروني<input id="email" type="email" autocomplete="username" required></label>
+<label>كلمة المرور<input id="password" type="password" autocomplete="current-password" required></label>
+<label><input id="confirm" type="checkbox" required> أفهم أن الحذف نهائي وأطلب حذف حسابي وبياناتي.</label>
+<button id="submit">حذف حسابي نهائياً</button></form><p id="message" role="status"></p>
+<script src="public-config.js"></script>
+<script>
+document.getElementById('form').addEventListener('submit',async(event)=>{
+  event.preventDefault(); const button=document.getElementById('submit'); const message=document.getElementById('message');
+  const password=document.getElementById('password'); button.disabled=true;
+  try {
+    const {supabaseUrl,anonKey}=window.JADWA_PUBLIC ?? {};
+    if(!supabaseUrl?.startsWith('https://') || !anonKey) throw Error('الخدمة قيد التجهيز');
+    const auth=await fetch(supabaseUrl+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:anonKey,'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('email').value,password:password.value})});
+    if(!auth.ok) throw Error('راجع البريد وكلمة المرور');
+    const session=await auth.json();
+    const result=await fetch(supabaseUrl+'/functions/v1/jadwa-api/v1/account/delete',{method:'POST',headers:{apikey:anonKey,Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({password:password.value})});
+    if(!result.ok) throw Error('تعذر إكمال الحذف الآن. أعد المحاولة أو تواصل مع دعم جدوى.');
+    message.textContent='تم حذف الحساب وبياناته من الخدمة.'; document.getElementById('form').hidden=true;
+  } catch(error) { message.textContent=error.message; }
+  finally { password.value='';button.disabled=false; }
+});
+</script></html>
