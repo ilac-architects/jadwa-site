@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>تأكيد البريد - جدوى AI</title><link rel="stylesheet" href="style.css">
+<style>.center{text-align:center}.icon{font-size:56px;line-height:1;margin:18px 0 6px}.hide{display:none}</style></head><body>
+<header><div class="wrap"><a class="brand" href="index.html">جدوى AI</a></div></header>
+<main class="wrap center">
+  <div id="ok">
+    <div class="icon" aria-hidden="true">&#10004;</div>
+    <h1>تم تأكيد بريدك</h1>
+    <p>حسابك في جدوى AI جاهز. ارجع إلى التطبيق وسجّل الدخول بالبريد وكلمة المرور.</p>
+    <p><a class="btn" id="open" href="jadwaai://auth/confirmed">افتح التطبيق</a></p>
+    <p class="updated">لو فتحت الرابط من جهاز غير الجوال اللي عليه التطبيق، يكفي تسجّل الدخول من التطبيق.</p>
+  </div>
+  <div id="err" class="hide">
+    <div class="icon" aria-hidden="true">&#9888;</div>
+    <h1>الرابط غير صالح أو انتهت صلاحيته</h1>
+    <p>ربما استُخدم الرابط من قبل. جرّب تسجيل الدخول من التطبيق، ولو طلب منك التأكيد اضغط «إعادة إرسال رابط التأكيد».</p>
+    <p><a class="btn" href="jadwaai://auth/confirmed">افتح التطبيق</a></p>
+  </div>
+  <p><a href="support.html">تحتاج مساعدة؟</a></p>
+</main>
+<script>
+(function () {
+  var h = location.hash || '', q = location.search || '';
+  var p = new URLSearchParams((h.charAt(0) === '#' ? h.slice(1) : h) + '&' + (q.charAt(0) === '?' ? q.slice(1) : q));
+  if (p.get('error') || p.get('error_code')) {
+    document.getElementById('ok').className = 'hide';
+    document.getElementById('err').className = '';
+  } else if (p.get('access_token')) {
+    // Hand the session to the app on this phone; the fragment never leaves the device.
+    document.getElementById('open').href = 'jadwaai://auth/confirmed' + h;
+  }
+  // Do not keep tokens in the address bar or history.
+  if (h) history.replaceState(null, '', location.pathname);
+})();
+</script>
+</body></html>
